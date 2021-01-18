@@ -4,15 +4,19 @@ import { useQuery } from '@apollo/react-hooks';
 import ProductItem from "../ProductItem";
 import { QUERY_PRODUCTS } from "../../utils/queries";
 import spinner from "../../assets/spinner.gif"
-import { useStoreContext} from '../../utils/GlobalState';
 import {UPDATE_PRODUCTS} from '../../utils/actions';
-
 import {idbPromise} from '../../utils/helpers';
+import {useSelector, useDispatch} from 'react-redux';
+
+const selectProducts = state => state.products;
+const selectCategory = state => state;
 
 function ProductList() {
-  const [state, dispatch] = useStoreContext();
+  const SelectedProducts = useSelector(selectProducts);
+  const SelectedCategory = useSelector(selectCategory);
+  const dispatch = useDispatch();
 
-  const {currentCategory} = state;
+  const {currentCategory} = SelectedCategory;
 
   const {loading, data} = useQuery(QUERY_PRODUCTS);
 
@@ -38,16 +42,16 @@ function ProductList() {
 
   function filterProducts() {
     if (!currentCategory) {
-      return state.products;
+      return SelectedProducts;
     }
   
-    return state.products.filter(product => product.category._id === currentCategory);
+    return SelectedProducts.filter(product => product.category._id === currentCategory);
   }
 
   return (
     <div className="my-2">
       <h2>Our Products:</h2>
-      {state.products.length ? (
+      {SelectedProducts.length ? (
         <div className="flex-row">
             {filterProducts().map(product => (
                 <ProductItem
